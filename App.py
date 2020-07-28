@@ -1,6 +1,15 @@
+from moviepy import video
 from pytube import YouTube as Yt
 from moviepy.video.io.VideoFileClip import VideoFileClip
 import os
+
+
+# check if file exist
+def checkIfFileExist(filePath):
+    if not os.path.exists(filePath):
+        return False
+    else:
+        return True
 
 
 class Download:
@@ -12,14 +21,27 @@ class Download:
 
     # download mp4 video via pytube, convert to mp3  and delete mp4
     def downloadAsMp3(self):
-        ytd = Yt(self.urlSource)  # creating object of video
-        ytd.streams.get_lowest_resolution().download(self.savePath, self.fileName)  # download mp4
-        self.convertToMp3()  # convert mp4
-        # removing mp4
+        # try download video when cannot return error code
         try:
-            os.remove(self.savePath + "/" + self.fileName + ".mp4")
-        except Exception as ei:
-            print("file dont exist".format(ei))
+            ytd = Yt(self.urlSource)  # creating object of video
+            ytd.streams.get_lowest_resolution().download(self.savePath, self.fileName)  # download mp4
+            # try convert video when cannot return error code
+            try:
+                self.convertToMp3()  # convert mp4
+                # removing mp4
+                if checkIfFileExist(self.savePath + "/" + self.fileName + ".mp4"):
+                    # try remove video when cannot return error code
+                    try:
+                        os.remove(self.savePath + "/" + self.fileName + ".mp4")
+                    finally:
+                        if not checkIfFileExist(self.savePath + "/" + self.fileName + ".mp4"):
+                            return -5
+            finally:
+                if not checkIfFileExist(self.savePath + "/" + self.fileName + ".mp3"):
+                    return -6
+        finally:
+            if not checkIfFileExist(self.savePath + "/" + self.fileName + ".mp3"):
+                return -4
 
     # convert mp4 to mp3 via moviepy
     def convertToMp3(self):
@@ -31,8 +53,13 @@ class Download:
 
     # download mp4 via pytube
     def downloadAsMp4(self):
-        ytd = Yt(self.urlSource)  # creating object of video
-        ytd.streams.get_highest_resolution().download(self.savePath, self.fileName)  # download mp4
+        # try download video when cannot return error code
+        try:
+            ytd = Yt(self.urlSource)  # creating object of video
+            ytd.streams.get_highest_resolution().download(self.savePath, self.fileName)  # download mp4
+        finally:
+            if not checkIfFileExist(self.savePath + "/" + self.fileName + ".mp4"):
+                return -4
 
 
 '''
