@@ -59,7 +59,7 @@ class MainPage(QMainWindow):
         fileName = self.getNameOfFile()
         # url and fileName is blank or url is non-existent show error and red mark the blank input field
         if url == "-1" and fileName == "-1":
-            self.setErrorVisible(50, "red")
+            self.setErrorVisible(100, "red")
             self.error.setText("Invalid input in url.\n")
             self.error.setAlignment(QtCore.Qt.AlignCenter)
             self.error.append("Invalid input in file name.")
