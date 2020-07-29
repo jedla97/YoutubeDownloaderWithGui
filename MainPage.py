@@ -1,8 +1,9 @@
 import os
 import sys
+import re
+import requests
 from os.path import expanduser
 
-import requests
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PyQt5.uic import loadUi
@@ -12,18 +13,21 @@ import App
 
 # pyinstaller --onefile --icon=resources/icon.ico --clean MainPage.py
 
-# testing if inputted url include youtube url
-def urlInclude(url):
-    youtubeUrl = ["https://www.youtube.com/", "www.youtube.com/", "youtube.com/", "https://youtube.com/"]
-    for i in youtubeUrl:
-        if i in url:
-            return True
+# testing if inputted url matched youtube arguments
+def checkIfUrlMatchingParameters(url):
+    ytReg = (r'(https?://)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)/(watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{'
+             r'11})')
+
+    ytReg_result = re.match(ytReg, url)
+    if ytReg_result:
+        return True
+
     return False
 
 
 # testing if url exist with testing on youtube url
 def urlExists(url):
-    if urlInclude(url):
+    if checkIfUrlMatchingParameters(url):
         r = requests.get(url, stream=True)
         if r.status_code == 200:
             return True
@@ -109,10 +113,10 @@ class MainPage(QMainWindow):
                 self.fileWillBeDownload(fileName)
                 QApplication.processEvents()
                 errorCode = file.downloadAsMp3()
-                if errorCode != -4 or errorCode != -5:
-                    self.fileDownloaded(fileName, path, "MP3")
+                if errorCode == -4 or errorCode == -5 or errorCode == -6:
+                    self.errorHandling(errorCode)
                 else:
-                    self.errorHandling(-4)
+                    self.fileDownloaded(fileName, path, "MP3")
             elif self.fileType.currentText() == "MP4":
                 file = App.Download(url, self.fileType.currentText(), path, fileName)
                 self.error.setAlignment(QtCore.Qt.AlignCenter)
@@ -140,7 +144,7 @@ class MainPage(QMainWindow):
             self.setErrorVisible(50, "red")
             self.error.setText("Not existing Path to directory")
         elif errorID == -3:
-            self.setErrorVisible(100, "red")
+            self.setErrorVisible(150, "red")
             self.error.setText("Cannot open file check if place where you installed file for file LastPath.txt in "
                                "resources directory if missing create new one")
         elif errorID == -4:
@@ -151,7 +155,7 @@ class MainPage(QMainWindow):
             self.error.setText("MP4 video cannot be deleted because some problems delete manually sorry for "
                                "inconvenience")
         elif errorID == -6:
-            self.setErrorVisible(50, "red")
+            self.setErrorVisible(100, "red")
             self.error.setText("Video cannot be converted try again when fail again contact administrator")
         else:
             self.setErrorVisible(50, "red")

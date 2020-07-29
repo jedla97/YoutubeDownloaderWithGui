@@ -1,7 +1,7 @@
 from moviepy import video
+import os
 from pytube import YouTube as Yt
 from moviepy.video.io.VideoFileClip import VideoFileClip
-import os
 
 
 # check if file exist
@@ -21,6 +21,7 @@ class Download:
 
     # download mp4 video via pytube, convert to mp3  and delete mp4
     def downloadAsMp3(self):
+        errorCode = 0;
         # try download video when cannot return error code
         try:
             ytd = Yt(self.urlSource)  # creating object of video
@@ -34,14 +35,20 @@ class Download:
                     try:
                         os.remove(self.savePath + "/" + self.fileName + ".mp4")
                     finally:
-                        if not checkIfFileExist(self.savePath + "/" + self.fileName + ".mp4"):
-                            return -5
+                        if checkIfFileExist(self.savePath + "/" + self.fileName + ".mp4"):
+                            if errorCode == 0:
+                                errorCode = -5
+                            return
             finally:
                 if not checkIfFileExist(self.savePath + "/" + self.fileName + ".mp3"):
-                    return -6
+                    if errorCode == 0:
+                        errorCode = -6
+                    return
         finally:
             if not checkIfFileExist(self.savePath + "/" + self.fileName + ".mp3"):
-                return -4
+                if errorCode == 0:
+                    errorCode = -4
+                return errorCode
 
     # convert mp4 to mp3 via moviepy
     def convertToMp3(self):
