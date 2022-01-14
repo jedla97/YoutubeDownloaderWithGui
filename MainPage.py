@@ -28,7 +28,11 @@ def checkIfUrlMatchingParameters(url):
 # testing if url exist with testing on youtube url
 def urlExists(url):
     if checkIfUrlMatchingParameters(url):
-        r = requests.get(url, stream=True)
+        #TODO fix problem with input without http/https
+        try:
+            r = requests.get(url, stream=True)
+        except Exception as e:
+            print(e)
         if r.status_code == 200:
             return True
         else:

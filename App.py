@@ -25,7 +25,7 @@ class Download:
         # try download video when cannot return error code
         try:
             ytd = Yt(self.urlSource)  # creating object of video
-            ytd.streams.get_lowest_resolution().download(self.savePath, self.fileName)  # download mp4
+            ytd.streams.get_lowest_resolution().download(self.savePath, self.fileName + ".mp4")  # download mp4
             # try convert video when cannot return error code
             try:
                 self.convertToMp3()  # convert mp4
@@ -63,18 +63,21 @@ class Download:
         # try download video when cannot return error code
         try:
             ytd = Yt(self.urlSource)  # creating object of video
-            ytd.streams.get_highest_resolution().download(self.savePath, self.fileName)  # download mp4
+            ytd.streams.get_highest_resolution().download(self.savePath, self.fileName + ".mp4")  # download mp4
         finally:
             if not checkIfFileExist(self.savePath + "/" + self.fileName + ".mp4"):
                 return -4
 
 
-'''
+"""
 # for testing purpose when some vid bad download print all and download by id(itag)
-vid = Yt('url')
+#Yt('https://youtu.be/2lAe1cqCOXo').streams.first().download("C:\\Users\\Jakub\\Desktop", "test.mp4")
+vid = Yt('https://youtu.be/2lAe1cqCOXo')
 for x in vid.streams:
     print(x)
 print("\n")
 print(vid.streams.get_highest_resolution())
-vid.streams.get_by_itag(22).download('location', "name")
-'''
+stream = vid.streams.get_by_itag(22)
+stream.download("C:\\Users\\Jakub\\Desktop", "test.mp4")
+print("end")
+"""

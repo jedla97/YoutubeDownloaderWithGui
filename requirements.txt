@@ -2,3 +2,4 @@ requests
 pytube3
 moviepy
 PyQt5
+pyinstaller
